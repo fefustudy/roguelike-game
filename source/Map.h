@@ -22,7 +22,7 @@ class Map {
 	vector<shared_ptr<Actor>> actors;
 	shared_ptr<Actor> mainPlayer;
 	map<pair<int, int>, shared_ptr<Actor>> posBase;
-	map<pair<int, int>, bool> FogOfWar;
+	map<pair<int, int>, bool> fogOfWar;
 
 
 public:
@@ -46,18 +46,6 @@ public:
 		auto hy = mainPlayer->GetPos().y;
 		pair<int, int> center = { hx,hy };
 
-		//i=0------H=6----------20-----H=26-----------40
-		//-------i=6
-		//
-		// 123456789
-		//        h    
-		//     h    
-		//
-
-
-		//hx - mx/2 -> hx - mx/2 + mx
-		//
-
 		auto zx = hx - mx / 2;
 		auto lx = hx + mx / 2;
 
@@ -66,12 +54,25 @@ public:
 
 		for (int y = zy; y < ly; y++) {
 			for (int x = zx; x < lx; x++) {
+
+				auto fit = fogOfWar.find({ x, y });
+				if (fit == fogOfWar.end()) {
+					if ((y - hy) * (y - hy) + (x - hx) * (x - hx) <= 17) {
+						fogOfWar[{x, y}] = true;
+					}
+					else {
+						mvaddch(y - hy + my / 2, x - hx + mx / 2, '#');
+						continue;
+					}
+				}
+
+
 				auto it = posBase.find({ x, y });
 				if (it != posBase.end()) {
 					mvaddch(y - hy + my / 2, x - hx + mx / 2, it->second->getSym());
 				}
 				else {
-					mvaddch(y - hy + my / 2, x- hx + mx / 2, ' ');
+					mvaddch(y - hy + my / 2, x - hx + mx / 2, ' ');
 				}
 
 			}

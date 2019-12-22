@@ -18,7 +18,7 @@ class Game {
 public:
 	Game(){
 		c = make_shared<Config>();
-		map = make_shared<Map>(c->FabricMap());
+		map = make_shared<Map>(c->FabricMap(), c->GetFog());
 	};
 
 	~Game() {};

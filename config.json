@@ -44,5 +44,9 @@
     "RIGHT": ">",
     "DOWN": "v",
     "LEFT": "<"
+  },
+  "FOG": {
+    "enable": true,
+    "distance": 5
   }
 }

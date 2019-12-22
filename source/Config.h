@@ -26,7 +26,11 @@ public:
 	T GetInfo(string name, string param) {
 		return j[name][param].get<T>()
 	}
+	std::pair<int, bool> GetFog() {
+		ifstream("config.json") >> j;
 
+		return{ j["FOG"]["distance"].get<int>() ,j["FOG"]["enable"].get<bool>() };
+	}
 
 	std::pair<vector<shared_ptr<Actor>>, shared_ptr<Knight>>  FabricMap() {
 
@@ -92,7 +96,7 @@ public:
 					out.push_back(make_shared < Wall>(Vec(x, y), j[a]["sym"].get<string>()[0]));
 				}
 				else if (a == "AidKit") {
-					out.push_back(make_shared < AidKit>(Vec(x,y),
+					out.push_back(make_shared < AidKit>(Vec(x, y),
 						j[a]["restoreHp"].get<int>(),
 						j[a]["sym"].get<string>()[0]));
 				}

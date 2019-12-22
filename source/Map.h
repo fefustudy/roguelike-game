@@ -22,13 +22,17 @@ class Map {
 	vector<shared_ptr<Actor>> actors;
 	shared_ptr<Actor> mainPlayer;
 	map<pair<int, int>, shared_ptr<Actor>> posBase;
-	map<pair<int, int>, bool> fogOfWar;
+	set<pair<int, int>> fogOfWar;
+	bool fogOfWarIsEnable;
+	int fogOfWarDistSqr;
 
 
 public:
-	Map(std::pair<vector<shared_ptr<Actor>>, shared_ptr<Knight>> data) : actors(data.first) {
-
-		mainPlayer = data.second;
+	Map(std::pair<vector<shared_ptr<Actor>>, shared_ptr<Knight>> data, std::pair<int, bool> fog)
+		: actors(data.first)
+		, mainPlayer(data.second)
+		, fogOfWarIsEnable(fog.second)
+		, fogOfWarDistSqr(fog.first* fog.first) {
 
 		for (auto it = actors.begin(); it != actors.end(); ++it) {
 			auto x = (*it)->GetPos().x;
@@ -55,17 +59,15 @@ public:
 		for (int y = zy; y < ly; y++) {
 			for (int x = zx; x < lx; x++) {
 
-				auto fit = fogOfWar.find({ x, y });
-				if (fit == fogOfWar.end()) {
-					if ((y - hy) * (y - hy) + (x - hx) * (x - hx) <= 17) {
-						fogOfWar[{x, y}] = true;
+				if (fogOfWarIsEnable && fogOfWar.find({ x, y }) == fogOfWar.end()) {
+					if ((y - hy) * (y - hy) + (x - hx) * (x - hx) <= fogOfWarDistSqr) {
+						fogOfWar.insert({ x, y });
 					}
 					else {
 						mvaddch(y - hy + my / 2, x - hx + mx / 2, '#');
 						continue;
 					}
 				}
-
 
 				auto it = posBase.find({ x, y });
 				if (it != posBase.end()) {

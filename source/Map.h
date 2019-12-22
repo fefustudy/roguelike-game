@@ -26,10 +26,10 @@ class Map {
 
 
 public:
-	Map(std::pair<vector<shared_ptr<Actor>>, shared_ptr<Knight>> data) : actors(data.first){
-		
+	Map(std::pair<vector<shared_ptr<Actor>>, shared_ptr<Knight>> data) : actors(data.first) {
+
 		mainPlayer = data.second;
-		
+
 		for (auto it = actors.begin(); it != actors.end(); ++it) {
 			auto x = (*it)->GetPos().x;
 			auto y = (*it)->GetPos().y;
@@ -45,20 +45,38 @@ public:
 		auto hx = mainPlayer->GetPos().x;
 		auto hy = mainPlayer->GetPos().y;
 		pair<int, int> center = { hx,hy };
-		
-		for (size_t y = 0; y < my; y++) {
-			for (size_t x = 0; x < mx; x++) {
+
+		//i=0------H=6----------20-----H=26-----------40
+		//-------i=6
+		//
+		// 123456789
+		//        h    
+		//     h    
+		//
+
+
+		//hx - mx/2 -> hx - mx/2 + mx
+		//
+
+		auto zx = hx - mx / 2;
+		auto lx = hx + mx / 2;
+
+		auto zy = hy - my / 2;
+		auto ly = hy + my / 2;
+
+		for (int y = zy; y < ly; y++) {
+			for (int x = zx; x < lx; x++) {
 				auto it = posBase.find({ x, y });
-				if (it != posBase.end()) { 
-					mvaddch(y, x, it->second->getSym());
+				if (it != posBase.end()) {
+					mvaddch(y - hy + my / 2, x - hx + mx / 2, it->second->getSym());
 				}
 				else {
-					mvaddch(y, x, ' ');
+					mvaddch(y - hy + my / 2, x- hx + mx / 2, ' ');
 				}
-				
+
 			}
 		}
-		mvaddch(hy, hx, mainPlayer->getSym());
+		//mvaddch(hy, hx, mainPlayer->getSym());
 
 		refresh();
 

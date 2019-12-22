@@ -38,7 +38,7 @@ public:
 
 		while (1) {
 			auto ch = getch();
-			if (ch != ERR && tMaxSpeedInterval.elapsedSeconds() > 0.1) {
+			if (ch != ERR && tMaxSpeedInterval.elapsedSeconds() > 0.05) {
 				auto pos = mainPlayer->GetPos();
 
 				if (ch == 'w' || ch == KEY_UP) {

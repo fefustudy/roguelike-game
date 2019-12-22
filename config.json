@@ -1,0 +1,48 @@
+{
+  "PAPA": {"TUTU": "WAWA" },
+  "Knight": {
+    "damage": 100,
+    "hp": 12,
+    "mana": 12,
+    "maxHp": 100,
+    "maxMana": 100,
+    "sym": "K"
+  },
+  "Princess": {
+    "damage": 100,
+    "hp": 12,
+    "mana": 12,
+    "maxHp": 100,
+    "maxMana": 100,
+    "sym": "P"
+  },
+  "Zombie": {
+    "damage": 100,
+    "hp": 12,
+    "mana": 12,
+    "maxHp": 100,
+    "maxMana": 100,
+    "sym": "Z"
+  },
+  "Dragon": {
+    "damage": 100,
+    "hp": 12,
+    "mana": 12,
+    "maxHp": 100,
+    "maxMana": 100,
+    "sym": "D"
+  },
+  "Wall": {
+    "sym": "O"
+  },
+  "AidKit": {
+    "restoreHp": 10,
+    "sym": "+"
+  },
+  "Projectile": {
+    "TOP": "^",
+    "RIGHT": ">",
+    "DOWN": "v",
+    "LEFT": "<"
+  }
+}

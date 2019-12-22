@@ -26,8 +26,6 @@ class Map {
 
 
 public:
-	
-
 	Map(std::pair<vector<shared_ptr<Actor>>, shared_ptr<Knight>> data) : actors(data.first){
 		
 		mainPlayer = data.second;
@@ -44,33 +42,45 @@ public:
 		int my, mx;
 		getmaxyx(stdscr, my, mx);
 
-		pair<int, int> center = { mainPlayer->GetPos().x, mainPlayer->GetPos().y };
+		auto hx = mainPlayer->GetPos().x;
+		auto hy = mainPlayer->GetPos().y;
+		pair<int, int> center = { hx,hy };
 		
-		mvaddch(center.first, center.second, mainPlayer->getSym());
-
-
 		for (size_t y = 0; y < my; y++) {
 			for (size_t x = 0; x < mx; x++) {
 				auto it = posBase.find({ x, y });
-				if (it == posBase.end()) continue;
-				mvaddch(y, x, it->second->getSym());
+				if (it != posBase.end()) { 
+					mvaddch(y, x, it->second->getSym());
+				}
+				else {
+					mvaddch(y, x, ' ');
+				}
+				
 			}
 		}
+		mvaddch(hy, hx, mainPlayer->getSym());
 
 		refresh();
 
 	};
 
+	shared_ptr<Actor> GetMainPlayer() {
+		return mainPlayer;
+	}
+
 	void Move(shared_ptr<Actor> from, Vec newPos) {
 		// call collide in Actor and in newPos Actor if it exist
-		auto it = posBase.find({ from->GetPos().x, from->GetPos().y });
-		if (it != posBase.end()) {
-			//from->Collide(*(it->second));
-			//it->second->Collide(*from);
+		auto it = posBase.find({ newPos.x, newPos.y });
+		auto fromPos = from->GetPos();
+
+		if (it == posBase.end()) {
+			posBase.erase({ fromPos.x, fromPos.y });
+			posBase[{ newPos.x, newPos.y }] = from;
+			from->SetPos(newPos);
 		}
 		else {
-			posBase.erase({ from->GetPos().x, from->GetPos().y });
-			posBase[{ newPos.x, newPos.y }] = from;
+			//from->Collide(*(it->second));
+			//it->second->Collide(*from);
 		}
 	}
 

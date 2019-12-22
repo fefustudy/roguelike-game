@@ -23,6 +23,7 @@ class Actor {
 	char sym;
 public:
 	Vec GetPos() { return pos; }
+	void SetPos(Vec p) { pos = p; }
 	char getSym() { return sym; }
 	Actor(char sym, Vec pos) : pos(pos), sym(sym) {}
 

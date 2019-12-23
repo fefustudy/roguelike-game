@@ -43,6 +43,7 @@ public:
 			posBase[{x, y}] = *it;
 		}
 
+
 	};
 
 	void Draw() { //Рисовать вокруг игрока
@@ -88,6 +89,8 @@ public:
 
 		mvprintw(0, 0, " HP: %i / %i ", c->getHp(), c->getMaxHp());
 		mvprintw(1, 0, " MP: %i / %i ", c->getMana(), c->getMaxMana());
+
+		mvprintw(my-1, 0, " Fire: SPACE,  Move: WASD ");
 
 		refresh();
 

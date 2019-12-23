@@ -45,6 +45,9 @@ public:
 		Timer tMaxSpeedInterval;
 		tMaxSpeedInterval.start();
 
+		Timer tMana;
+		tMana.start();
+
 		mainPlayer = map->GetMainPlayer();
 		
 
@@ -54,7 +57,7 @@ public:
 			auto ch = getch();
 			if (ch != ERR && tMaxSpeedInterval.elapsedSeconds() > 0.05) {
 
-				auto pos = mainPlayer->GetPos();
+				auto pos = mainPlayer->getPos();
 
 				if (ch == 'w' || ch == KEY_UP) {
 					map->Step(mainPlayer, Vec::UP);
@@ -84,6 +87,10 @@ public:
 			if (t.elapsedSeconds() >= 1.0) {
 				MoveMobs();
 				t.start();
+			}
+			if (tMana.elapsedSeconds() >= 1.0) {
+				RestoreMana(1);
+				tMana.start();
 			}
 
 			map->Draw();
@@ -116,20 +123,28 @@ public:
 
 
 	void Fire(shared_ptr<Character> a) {
-		auto pl = make_shared<Projectile>(
-			a->GetPos() + a->GetDirection(), a->GetDirection(),
-			a->getDamage(), 10);
-
-		if (map->Add(pl))
+		auto pl = a->Fire();
+		if (pl && map->Add(pl)) {
 			moveDirection.insert(pl);
+		}
 	}
  
+
+	void RestoreMana(int count) {
+		for (auto it = actors->begin(); it != actors->end(); it++) {
+			auto en = dynamic_pointer_cast<Character>(*it);
+			if (en) {
+				en->AddMana(count);
+			}
+		}
+	}
 
 	void MoveMobs() { //AI
 		for (auto it = actors->begin(); it != actors->end(); it++) {
 			auto en = dynamic_pointer_cast<Enemy>(*it);
 			if (en) {
 				map->Step(en, Vec::DIRS[rand() % 4]);
+				Fire(en);
 			}
 		}
 	}
@@ -138,7 +153,7 @@ public:
 	void moveProjectilies() {
 		for (auto it = moveDirection.begin(); it != moveDirection.end(); it++) {
 			if (static_pointer_cast<Projectile>(*it)->IsNext()) {
-				map->Step(*it, (*it)->GetDirection());
+				map->Step(*it, (*it)->getDirection());
 			}
 			else {
 				(*it)->MarkForDelete();

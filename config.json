@@ -2,9 +2,9 @@
   "PAPA": {"TUTU": "WAWA" },
   "Knight": {
     "damage": 5,
-    "hp": 12,
+    "hp": 100,
     "mana": 12,
-    "maxHp": 100,
+    "maxHp": 150,
     "maxMana": 100,
     "sym": "K"
   },
@@ -17,17 +17,17 @@
     "sym": "P"
   },
   "Zombie": {
-    "damage": 100,
+    "damage": 5,
     "hp": 10,
-    "mana": 12,
-    "maxHp": 100,
-    "maxMana": 100,
+    "mana": 0,
+    "maxHp": 10,
+    "maxMana": 0,
     "sym": "Z"
   },
   "Dragon": {
-    "damage": 100,
+    "damage": 10,
     "hp": 15,
-    "mana": 12,
+    "mana": 100,
     "maxHp": 100,
     "maxMana": 100,
     "sym": "D"
@@ -47,6 +47,6 @@
   },
   "FOG": {
     "enable": true,
-    "distance": 7
+    "distance": 15
   }
 }

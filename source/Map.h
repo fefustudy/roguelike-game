@@ -38,8 +38,8 @@ public:
 		, fogOfWarDistSqr(fog.first* fog.first) {
 
 		for (auto it = actors->begin(); it != actors->end(); ++it) {
-			auto x = (*it)->GetPos().x;
-			auto y = (*it)->GetPos().y;
+			auto x = (*it)->getPos().x;
+			auto y = (*it)->getPos().y;
 			posBase[{x, y}] = *it;
 		}
 
@@ -49,8 +49,8 @@ public:
 		int my, mx;
 		getmaxyx(stdscr, my, mx);
 
-		auto hx = mainPlayer->GetPos().x;
-		auto hy = mainPlayer->GetPos().y;
+		auto hx = mainPlayer->getPos().x;
+		auto hy = mainPlayer->getPos().y;
 		pair<int, int> center = { hx,hy };
 
 		auto zx = hx - mx / 2;
@@ -100,7 +100,7 @@ public:
 	void Move(shared_ptr<Actor> from, Vec newPos) {
 		// call collide in Actor and in newPos Actor if it exist
 		auto it = posBase.find({ newPos.x, newPos.y });
-		auto fromPos = from->GetPos();
+		auto fromPos = from->getPos();
 
 		if (it == posBase.end()) {
 			posBase.erase({ fromPos.x, fromPos.y });
@@ -114,11 +114,11 @@ public:
 	}
 	void Step(shared_ptr<Actor> from, Vec dir) {
 		from->SetLastDir(dir);
-		Move(from, from->GetPos() + dir);
+		Move(from, from->getPos() + dir);
 	}
 	
 	bool Add(shared_ptr<Actor> a) {
-		auto pos = a->GetPos();
+		auto pos = a->getPos();
 		auto it = posBase.find({ pos.x, pos.y });
 
 		if (it == posBase.end()) {
@@ -130,7 +130,7 @@ public:
 	}
 
 	void Hide(shared_ptr<Actor> from) {
-		auto fromPos = from->GetPos();
+		auto fromPos = from->getPos();
 		posBase.erase({ fromPos.x, fromPos.y });
 	}
 

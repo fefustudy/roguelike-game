@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 using std::shared_ptr;
+using std::make_shared;
 
 class Enemy;
 class Actor;
@@ -45,11 +46,11 @@ class Actor {
 	bool isDel = false;
 public:
 
-	Vec GetPos() { return pos; }
+	Vec getPos() { return pos; }
 	void SetPos(Vec p) { pos = p; }
 	void SetLastDir(Vec p) { lastDir = p; }
 	char GetSym() { return sym; }
-	Vec GetDirection() { return lastDir; }
+	Vec getDirection() { return lastDir; }
 	void MarkForDelete() { isDel = true; }
 	bool isMarkForDelete() { return isDel; }
 	Actor(char sym, Vec pos) :pos(pos), sym(sym), lastDir(Vec(1, 0)) {}
@@ -77,7 +78,7 @@ public:
 	int getDamage() { return damage; }
 	int getMaxHp() { return maxHp; }
 	int getMana() { return mana; }
-	int getMaxMana() { return mana; }
+	int getMaxMana() { return maxMana; }
 
 	Character(int hp, int damage, int maxHp, int mana, int maxMana, char sym, Vec pos) : Actor(sym, pos), hp(hp), damage(damage), maxHp(maxHp), mana(mana), maxMana(maxMana) {};
 
@@ -86,12 +87,25 @@ public:
 		if (hp <= 0) MarkForDelete();
 		if (hp > maxHp) hp = maxHp;
 	}
+	
+	void AddMana(int p) {
+		mana += p;
+		if (mana > maxMana) mana = maxMana;
+	}
+
+	virtual shared_ptr<Projectile> Fire() { return nullptr; };
 };
 
 
 class Enemy : public Character {
 public:
 	Enemy(int hp, int damage, int maxHp, int mana, int maxMana, char sym, Vec pos) : Character(hp, damage, maxHp, mana, maxMana, sym, pos) {};
+
+	shared_ptr<Projectile> Fire() override{
+		if (mana == 0) return nullptr;
+		mana--;
+		return make_shared<Projectile>(getPos() + getDirection(), getDirection(), getDamage(), 10, true);
+	}
 };
 
 
@@ -115,27 +129,7 @@ public:
 };
 
 
-class Knight : public Character {
-public:
-	Knight(Vec pos, int hp, int damage, int maxHp, int mana, int maxMana, char sym) : Character(hp, damage, maxHp, mana, maxMana, sym, pos) {}
 
-	void Collide(shared_ptr<Actor> obj) override {
-		obj->Collide(this);
-	}
-
-	void Collide(AidKit* o) override {
-		AddHp(o->GetRestoreHp());
-		o->MarkForDelete();
-	}
-
-	void Collide(Dragon* o) override {}
-	void Collide(Knight* o) override {}
-	void Collide(Wall* o) override {}
-	void Collide(Projectile* o) override {}
-	void Collide(Princess* o) override {}
-	void Collide(Zombie* o) override {}
-
-};
 
 
 class Princess : public Character {
@@ -185,15 +179,55 @@ public:
 	void Collide(Zombie* o) override {}
 };
 
+class Knight : public Character {
+public:
+	Knight(Vec pos, int hp, int damage, int maxHp, int mana, int maxMana, char sym) : Character(hp, damage, maxHp, mana, maxMana, sym, pos) {}
+
+	void Collide(shared_ptr<Actor> obj) override {
+		obj->Collide(this);
+	}
+
+	void Collide(AidKit* o) override {
+		AddHp(o->GetRestoreHp());
+		o->MarkForDelete();
+	}
+
+	void Collide(Dragon* o) override {
+		AddHp(-o->getDamage());
+		o->AddHp(-getDamage());
+	}
+
+	void Collide(Knight* o) override {}
+	void Collide(Wall* o) override {}
+	void Collide(Projectile* o) override {}
+
+	void Collide(Princess* o) override {
+		MarkForDelete();
+	}
+
+	void Collide(Zombie* o) override {
+		AddHp(-o->getDamage());
+		o->AddHp(-getDamage());
+	}
+
+	shared_ptr<Projectile> Fire() override {
+		if (mana == 0) return nullptr;
+		mana--;
+		return make_shared<Projectile>(getPos() + getDirection(), getDirection(), getDamage(), 10, false);
+	}
+
+};
+
+
 
 class Projectile : public Character { // пуля
-
 	int maxDist;
+	bool isEnemy;
 	int path = 0;
 
 public:
 
-	Projectile(Vec pos, Vec dir, int damage, int maxDist) : Character(1, damage, 1, 0, 0, DirSym(dir), pos), maxDist(maxDist) {
+	Projectile(Vec pos, Vec dir, int damage, int maxDist, bool isEnemy) : Character(1, damage, 1, 0, 0, DirSym(dir), pos), maxDist(maxDist), isEnemy(isEnemy){
 		SetLastDir(dir);
 	}
 
@@ -215,8 +249,12 @@ public:
 	void Collide(AidKit* o) override {
 		MarkForDelete();
 	}
+	void Collide(Zombie* o) override {
+		if (!isEnemy) o->AddHp(-damage);
+		MarkForDelete();
+	}
 	void Collide(Dragon* o) override {
-		o->AddHp(-damage);
+		if(!isEnemy) o->AddHp(-damage);
 		MarkForDelete();
 	}
 	void Collide(Knight* o) override {
@@ -233,10 +271,7 @@ public:
 	void Collide(Princess* o) override {
 		MarkForDelete();
 	}
-	void Collide(Zombie* o) override {
-		o->AddHp(-damage);
-		MarkForDelete();
-	}
+	
 };
 
 

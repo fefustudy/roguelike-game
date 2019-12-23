@@ -13,6 +13,8 @@ using std::set;
 using std::pair;
 using std::shared_ptr;
 using std::make_shared;
+using std::dynamic_pointer_cast;
+
 
 struct Cell {
 	Actor* actor;
@@ -82,6 +84,10 @@ public:
 			}
 		}
 		//mvaddch(hy, hx, mainPlayer->getSym());
+		auto c = static_pointer_cast<Character>(mainPlayer);
+
+		mvprintw(0, 0, " HP: %i / %i ", c->getHp(), c->getMaxHp());
+		mvprintw(1, 0, " MP: %i / %i ", c->getMana(), c->getMaxMana());
 
 		refresh();
 

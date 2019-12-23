@@ -1,7 +1,7 @@
 {
   "PAPA": {"TUTU": "WAWA" },
   "Knight": {
-    "damage": 100,
+    "damage": 5,
     "hp": 12,
     "mana": 12,
     "maxHp": 100,
@@ -18,7 +18,7 @@
   },
   "Zombie": {
     "damage": 100,
-    "hp": 12,
+    "hp": 10,
     "mana": 12,
     "maxHp": 100,
     "maxMana": 100,
@@ -26,7 +26,7 @@
   },
   "Dragon": {
     "damage": 100,
-    "hp": 12,
+    "hp": 15,
     "mana": 12,
     "maxHp": 100,
     "maxMana": 100,

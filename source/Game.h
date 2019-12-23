@@ -5,10 +5,13 @@
 #include "Config.h"
 #include "Timer.h"
 #include <algorithm> // std::remove_if
+#include <cstdlib>
 
 using std::shared_ptr;
 using std::make_shared;
 using std::static_pointer_cast;
+using std::srand;
+using std::rand;
 
 
 class Game {
@@ -32,6 +35,7 @@ public:
 	~Game() {};
 
 	void Start() {
+		srand(117);
 
 		Timer t;
 		t.start();
@@ -42,10 +46,10 @@ public:
 		tMaxSpeedInterval.start();
 
 		mainPlayer = map->GetMainPlayer();
-
+		
 
 		while (1) {
-			Clean();
+			if (Clean()) return;
 
 			auto ch = getch();
 			if (ch != ERR && tMaxSpeedInterval.elapsedSeconds() > 0.05) {
@@ -53,16 +57,16 @@ public:
 				auto pos = mainPlayer->GetPos();
 
 				if (ch == 'w' || ch == KEY_UP) {
-					map->Step(mainPlayer, Vec(0, -1));
+					map->Step(mainPlayer, Vec::UP);
 				}
 				else if (ch == 'd' || ch == KEY_RIGHT) {
-					map->Step(mainPlayer, Vec(1, 0));
+					map->Step(mainPlayer, Vec::RIGHT);
 				}
 				else if (ch == 's' || ch == KEY_DOWN) {
-					map->Step(mainPlayer, Vec(0, 1));
+					map->Step(mainPlayer, Vec::DOWN);
 				}
 				else if (ch == 'a' || ch == KEY_LEFT) {
-					map->Step(mainPlayer, Vec(-1, 0));
+					map->Step(mainPlayer, Vec::LEFT);
 				}
 				else if (ch == ' ') { //Стрелятб
 					Fire(static_pointer_cast<Character>(mainPlayer));
@@ -73,14 +77,12 @@ public:
 			}
 
 			if (tshot.elapsedSeconds() >= 0.2) {
-				// move Projectilies direction
 				moveProjectilies();
 				tshot.start();
 			}
 
 			if (t.elapsedSeconds() >= 1.0) {
-				// move mobs randomly
-
+				MoveMobs();
 				t.start();
 			}
 
@@ -90,7 +92,12 @@ public:
 		}
 	};
 
-	void Clean() {
+	bool Clean() {
+		if (mainPlayer->isMarkForDelete()) {
+			// игра конец
+			return true;
+		}
+
 		vector<shared_ptr<Actor>> forDel;
 
 		for (auto it = actors->begin(); it != actors->end(); it++) {
@@ -104,6 +111,7 @@ public:
 			actors->erase(*it);
 			moveDirection.erase(*it);
 		}
+		return false;
 	}
 
 
@@ -114,6 +122,16 @@ public:
 
 		if (map->Add(pl))
 			moveDirection.insert(pl);
+	}
+ 
+
+	void MoveMobs() { //AI
+		for (auto it = actors->begin(); it != actors->end(); it++) {
+			auto en = dynamic_pointer_cast<Enemy>(*it);
+			if (en) {
+				map->Step(en, Vec::DIRS[rand() % 4]);
+			}
+		}
 	}
 
 

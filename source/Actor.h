@@ -2,6 +2,7 @@
 #include <memory>
 using std::shared_ptr;
 
+class Enemy;
 class Actor;
 class Character;
 
@@ -16,6 +17,8 @@ class Projectile;
 
 
 struct Vec {
+	static const Vec UP, RIGHT, DOWN, LEFT;
+	static const Vec DIRS[];
 	int x, y;
 	Vec(int x, int y) : x(x), y(y) {}
 
@@ -26,7 +29,13 @@ struct Vec {
 	Vec operator-(const Vec& rhs) {
 		return Vec(x - rhs.x, y - rhs.y);
 	}
+	~Vec() {}
 };
+const struct Vec Vec::UP = { 0 , -1 };
+const struct Vec Vec::RIGHT = { 1 , 0 };
+const struct Vec Vec::DOWN = { 0 , 1 };
+const struct Vec Vec::LEFT = { -1 , 0 };
+const struct Vec Vec::DIRS[] = { Vec::UP, Vec::RIGHT, Vec::DOWN, Vec::LEFT };
 
 
 class Actor {
@@ -72,6 +81,37 @@ public:
 
 	Character(int hp, int damage, int maxHp, int mana, int maxMana, char sym, Vec pos) : Actor(sym, pos), hp(hp), damage(damage), maxHp(maxHp), mana(mana), maxMana(maxMana) {};
 
+	void AddHp(int p) {
+		hp += p;
+		if (hp <= 0) MarkForDelete();
+		if (hp > maxHp) hp = maxHp;
+	}
+};
+
+
+class Enemy : public Character {
+public:
+	Enemy(int hp, int damage, int maxHp, int mana, int maxMana, char sym, Vec pos) : Character(hp, damage, maxHp, mana, maxMana, sym, pos) {};
+};
+
+
+class AidKit : public Actor {
+	int restoreHp;
+
+public:
+	int GetRestoreHp() { return restoreHp; }
+
+	AidKit(Vec pos, int restoreHp, char sym) : Actor(sym, pos), restoreHp(restoreHp) {}
+	void Collide(shared_ptr<Actor> obj) override {
+		obj->Collide(this);
+	}
+	void Collide(AidKit* o) override {}
+	void Collide(Dragon* o) override {}
+	void Collide(Knight* o) override {}
+	void Collide(Wall* o) override {}
+	void Collide(Projectile* o) override {}
+	void Collide(Princess* o) override {}
+	void Collide(Zombie* o) override {}
 };
 
 
@@ -83,7 +123,11 @@ public:
 		obj->Collide(this);
 	}
 
-	void Collide(AidKit* o) override {}
+	void Collide(AidKit* o) override {
+		AddHp(o->GetRestoreHp());
+		o->MarkForDelete();
+	}
+
 	void Collide(Dragon* o) override {}
 	void Collide(Knight* o) override {}
 	void Collide(Wall* o) override {}
@@ -92,10 +136,11 @@ public:
 	void Collide(Zombie* o) override {}
 
 };
+
 
 class Princess : public Character {
 public:
-	Princess(Vec pos, int hp, int damage, int maxHp, int mana, int maxMana, char sym) : Character( hp, damage, maxHp, mana, maxMana, sym, pos) {}
+	Princess(Vec pos, int hp, int damage, int maxHp, int mana, int maxMana, char sym) : Character(hp, damage, maxHp, mana, maxMana, sym, pos) {}
 	void Collide(shared_ptr<Actor> obj) override {
 		obj->Collide(this);
 	}
@@ -109,9 +154,9 @@ public:
 
 };
 
-class Zombie : public Character {
+class Zombie : public Enemy {
 public:
-	Zombie(Vec pos, int hp, int damage, int maxHp, int mana, int maxMana, char sym) : Character( hp, damage, maxHp, mana, maxMana, sym, pos) {}
+	Zombie(Vec pos, int hp, int damage, int maxHp, int mana, int maxMana, char sym) : Enemy(hp, damage, maxHp, mana, maxMana, sym, pos) {}
 	void Collide(shared_ptr<Actor> obj) override {
 		obj->Collide(this);
 	}
@@ -124,9 +169,9 @@ public:
 	void Collide(Zombie* o) override {}
 };
 
-class Dragon : public Character {
+class Dragon : public Enemy {
 public:
-	Dragon(Vec pos, int hp, int damage, int maxHp, int mana, int maxMana, char sym) : Character( hp, damage, maxHp, mana, maxMana, sym, pos) {}
+	Dragon(Vec pos, int hp, int damage, int maxHp, int mana, int maxMana, char sym) : Enemy(hp, damage, maxHp, mana, maxMana, sym, pos) {}
 
 	void Collide(shared_ptr<Actor> obj) override {
 		obj->Collide(this);
@@ -167,13 +212,31 @@ public:
 		obj->Collide(this);
 	}
 
-	void Collide(AidKit* o) override {}
-	void Collide(Dragon* o) override {}
-	void Collide(Knight* o) override {}
-	void Collide(Wall* o) override {}
-	void Collide(Projectile* o) override {}
-	void Collide(Princess* o) override {}
-	void Collide(Zombie* o) override {}
+	void Collide(AidKit* o) override {
+		MarkForDelete();
+	}
+	void Collide(Dragon* o) override {
+		o->AddHp(-damage);
+		MarkForDelete();
+	}
+	void Collide(Knight* o) override {
+		o->AddHp(-damage);
+		MarkForDelete();
+	}
+	void Collide(Wall* o) override {
+		MarkForDelete();
+	}
+	void Collide(Projectile* o) override {
+		MarkForDelete();
+		o->MarkForDelete();
+	}
+	void Collide(Princess* o) override {
+		MarkForDelete();
+	}
+	void Collide(Zombie* o) override {
+		o->AddHp(-damage);
+		MarkForDelete();
+	}
 };
 
 
@@ -188,21 +251,6 @@ public:
 	void Collide(Knight* o) override {}
 	void Collide(AidKit* o) override {}
 	void Collide(Dragon* o) override {}
-	void Collide(Wall* o) override {}
-	void Collide(Projectile* o) override {}
-	void Collide(Princess* o) override {}
-	void Collide(Zombie* o) override {}
-};
-
-class AidKit : public Actor {
-public:
-	AidKit(Vec pos, int restoreHp, char sym) : Actor( sym, pos) {}
-	void Collide(shared_ptr<Actor> obj) override {
-		obj->Collide(this);
-	}
-	void Collide(AidKit* o) override {}
-	void Collide(Dragon* o) override {}
-	void Collide(Knight* o) override {}
 	void Collide(Wall* o) override {}
 	void Collide(Projectile* o) override {}
 	void Collide(Princess* o) override {}

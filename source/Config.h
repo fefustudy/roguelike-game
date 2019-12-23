@@ -15,11 +15,8 @@ class Config {
 
 public:
 	Config() {
-		//auto sym = j["Wall"]["sym"].get<string>();
-		////auto yy = j["PAPA"]["TUTU"].get<string>();
-		//std::cout << sym << std::endl;
-		//std::cout << "huh" << std::endl;
-		//std::cout << "huh" << std::endl;
+		//auto yy = j["PAPA"]["TUTU"].get<string>();
+		//std::cout << yy << std::endl;
 	}
 
 	template<class T>
@@ -32,7 +29,7 @@ public:
 		return{ j["FOG"]["distance"].get<int>() ,j["FOG"]["enable"].get<bool>() };
 	}
 
-	std::pair<vector<shared_ptr<Actor>>, shared_ptr<Knight>>  FabricMap() {
+	std::pair<shared_ptr<set<shared_ptr<Actor>>>, shared_ptr<Knight>>  FabricMap() {
 
 		ifstream("config.json") >> j;
 		ifstream("mapConfig.json") >> m;
@@ -40,7 +37,7 @@ public:
 		ifstream in("map.txt");
 		string str;
 
-		vector<shared_ptr<Actor>> out;
+		auto out = make_shared <set<shared_ptr<Actor>>>();
 
 		shared_ptr<Knight> mainPlayer;
 
@@ -61,10 +58,10 @@ public:
 						j[a]["maxMana"].get<int>(),
 						j[a]["sym"].get<string>()[0]);
 
-					out.push_back(mainPlayer);
+					out->insert(mainPlayer);
 				}
 				else if (a == "Princess") {
-					out.push_back(make_shared<Princess>(Vec(x, y),
+					out->insert(make_shared<Princess>(Vec(x, y),
 						j[a]["hp"].get<int>(),
 						j[a]["damage"].get<int>(),
 						j[a]["maxHp"].get<int>(),
@@ -75,7 +72,7 @@ public:
 				else if (a == "Zombie") {
 					auto hp = j[a]["hp"].get<int>();
 
-					out.push_back(make_shared < Zombie>(Vec(x, y),
+					out->insert(make_shared < Zombie>(Vec(x, y),
 						hp,
 						j[a]["damage"].get<int>(),
 						j[a]["maxHp"].get<int>(),
@@ -84,7 +81,7 @@ public:
 						j[a]["sym"].get<string>()[0]));
 				}
 				else if (a == "Dragon") {
-					out.push_back(make_shared < Dragon>(Vec(x, y),
+					out->insert(make_shared < Dragon>(Vec(x, y),
 						j[a]["hp"].get<int>(),
 						j[a]["damage"].get<int>(),
 						j[a]["maxHp"].get<int>(),
@@ -93,10 +90,10 @@ public:
 						j[a]["sym"].get<string>()[0]));
 				}
 				else if (a == "Wall") {
-					out.push_back(make_shared < Wall>(Vec(x, y), j[a]["sym"].get<string>()[0]));
+					out->insert(make_shared < Wall>(Vec(x, y), j[a]["sym"].get<string>()[0]));
 				}
 				else if (a == "AidKit") {
-					out.push_back(make_shared < AidKit>(Vec(x, y),
+					out->insert(make_shared < AidKit>(Vec(x, y),
 						j[a]["restoreHp"].get<int>(),
 						j[a]["sym"].get<string>()[0]));
 				}

@@ -1,7 +1,7 @@
 //#include "Actor.h"
 #include "Game.h"
 #include <string>
-//#include <curses.h>
+#include <curses.h>
 
 #include <iostream>
 

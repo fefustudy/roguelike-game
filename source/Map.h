@@ -1,5 +1,6 @@
 #pragma once
 #include "Actor.h"
+#include "Game.h"
 #include <vector>
 #include <map>
 #include <set>
@@ -19,7 +20,7 @@ struct Cell {
 
 // отрисовка и тд
 class Map {
-	vector<shared_ptr<Actor>> actors;
+	shared_ptr <set<shared_ptr<Actor>>> actors;
 	shared_ptr<Actor> mainPlayer;
 	map<pair<int, int>, shared_ptr<Actor>> posBase;
 	set<pair<int, int>> fogOfWar;
@@ -28,13 +29,13 @@ class Map {
 
 
 public:
-	Map(std::pair<vector<shared_ptr<Actor>>, shared_ptr<Knight>> data, std::pair<int, bool> fog)
+	Map(std::pair<shared_ptr<set<shared_ptr<Actor>>>, shared_ptr<Knight>> data, std::pair<int, bool> fog)
 		: actors(data.first)
 		, mainPlayer(data.second)
 		, fogOfWarIsEnable(fog.second)
 		, fogOfWarDistSqr(fog.first* fog.first) {
 
-		for (auto it = actors.begin(); it != actors.end(); ++it) {
+		for (auto it = actors->begin(); it != actors->end(); ++it) {
 			auto x = (*it)->GetPos().x;
 			auto y = (*it)->GetPos().y;
 			posBase[{x, y}] = *it;
@@ -62,6 +63,7 @@ public:
 				if (fogOfWarIsEnable && fogOfWar.find({ x, y }) == fogOfWar.end()) {
 					if ((y - hy) * (y - hy) + (x - hx) * (x - hx) <= fogOfWarDistSqr) {
 						fogOfWar.insert({ x, y });
+						// TODO: вставить сюда рандом генерацию карты
 					}
 					else {
 						mvaddch(y - hy + my / 2, x - hx + mx / 2, '#');
@@ -71,7 +73,7 @@ public:
 
 				auto it = posBase.find({ x, y });
 				if (it != posBase.end()) {
-					mvaddch(y - hy + my / 2, x - hx + mx / 2, it->second->getSym());
+					mvaddch(y - hy + my / 2, x - hx + mx / 2, it->second->GetSym());
 				}
 				else {
 					mvaddch(y - hy + my / 2, x - hx + mx / 2, ' ');
@@ -100,9 +102,30 @@ public:
 			from->SetPos(newPos);
 		}
 		else {
-			//from->Collide(*(it->second));
-			//it->second->Collide(*from);
+			from->Collide(it->second);
+			it->second->Collide(from);
 		}
+	}
+	void Step(shared_ptr<Actor> from, Vec dir) {
+		from->SetLastDir(dir);
+		Move(from, from->GetPos() + dir);
+	}
+	
+	bool Add(shared_ptr<Actor> a) {
+		auto pos = a->GetPos();
+		auto it = posBase.find({ pos.x, pos.y });
+
+		if (it == posBase.end()) {
+			posBase[{ pos.x, pos.y }] = a;
+			actors->insert(a);
+		}
+
+		return it == posBase.end();
+	}
+
+	void Hide(shared_ptr<Actor> from) {
+		auto fromPos = from->GetPos();
+		posBase.erase({ fromPos.x, fromPos.y });
 	}
 
 	~Map() {

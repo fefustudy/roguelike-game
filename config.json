@@ -47,6 +47,6 @@
   },
   "FOG": {
     "enable": true,
-    "distance": 5
+    "distance": 7
   }
 }

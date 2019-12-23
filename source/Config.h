@@ -1,6 +1,5 @@
 #include <fstream>
 #include <nlohmann/json.hpp>
-#include <vector>
 #include "Actor.h"
 
 using nlohmann::json;
@@ -14,15 +13,8 @@ class Config {
 	json j, m;
 
 public:
-	Config() {
-		//auto yy = j["PAPA"]["TUTU"].get<string>();
-		//std::cout << yy << std::endl;
-	}
+	Config() { }
 
-	template<class T>
-	T GetInfo(string name, string param) {
-		return j[name][param].get<T>()
-	}
 	std::pair<int, bool> GetFog() {
 		ifstream("config.json") >> j;
 
@@ -90,7 +82,7 @@ public:
 						j[a]["sym"].get<string>()[0]));
 				}
 				else if (a == "Wall") {
-					out->insert(make_shared < Wall>(Vec(x, y), j[a]["sym"].get<string>()[0]));
+					out->insert(make_shared<Wall>(Vec(x, y), j[a]["sym"].get<string>()[0]));
 				}
 				else if (a == "AidKit") {
 					out->insert(make_shared < AidKit>(Vec(x, y),

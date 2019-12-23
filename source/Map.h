@@ -6,6 +6,7 @@
 #include <set>
 #include <curses.h>
 #include <memory>
+#include <cstdlib>
 
 using std::vector;
 using std::map;
@@ -15,12 +16,10 @@ using std::shared_ptr;
 using std::make_shared;
 using std::dynamic_pointer_cast;
 
-
 struct Cell {
 	Actor* actor;
 };
 
-// отрисовка и тд
 class Map {
 	shared_ptr <set<shared_ptr<Actor>>> actors;
 	shared_ptr<Actor> mainPlayer;
@@ -42,8 +41,6 @@ public:
 			auto y = (*it)->getPos().y;
 			posBase[{x, y}] = *it;
 		}
-
-
 	};
 
 	void Draw() { //–исовать вокруг игрока
@@ -66,7 +63,16 @@ public:
 				if (fogOfWarIsEnable && fogOfWar.find({ x, y }) == fogOfWar.end()) {
 					if ((y - hy) * (y - hy) + (x - hx) * (x - hx) <= fogOfWarDistSqr) {
 						fogOfWar.insert({ x, y });
-						// TODO: вставить сюда рандом генерацию карты
+
+						// TODO: генераци€ карты
+						/*if (rand() % 100 < 10) {
+							if (rand() % 100 < 50) {
+								Add()
+							}
+							else {
+
+							}
+						}*/
 					}
 					else {
 						mvaddch(y - hy + my / 2, x - hx + mx / 2, '#');
@@ -84,7 +90,6 @@ public:
 
 			}
 		}
-		//mvaddch(hy, hx, mainPlayer->getSym());
 		auto c = static_pointer_cast<Character>(mainPlayer);
 
 		mvprintw(0, 0, " HP: %i / %i ", c->getHp(), c->getMaxHp());
@@ -101,7 +106,6 @@ public:
 	}
 
 	void Move(shared_ptr<Actor> from, Vec newPos) {
-		// call collide in Actor and in newPos Actor if it exist
 		auto it = posBase.find({ newPos.x, newPos.y });
 		auto fromPos = from->getPos();
 

@@ -15,8 +15,6 @@ class Wall;
 class AidKit;
 class Projectile;
 
-
-
 struct Vec {
 	static const Vec UP, RIGHT, DOWN, LEFT;
 	static const Vec DIRS[];
@@ -37,7 +35,6 @@ const struct Vec Vec::RIGHT = { 1 , 0 };
 const struct Vec Vec::DOWN = { 0 , 1 };
 const struct Vec Vec::LEFT = { -1 , 0 };
 const struct Vec Vec::DIRS[] = { Vec::UP, Vec::RIGHT, Vec::DOWN, Vec::LEFT };
-
 
 class Actor {
 	Vec pos;
@@ -67,8 +64,6 @@ public:
 	virtual void Collide(Zombie*) = 0;
 };
 
-
-
 class Character : public Actor {
 public:
 
@@ -96,7 +91,6 @@ public:
 	virtual shared_ptr<Projectile> Fire() { return nullptr; };
 };
 
-
 class Enemy : public Character {
 public:
 	Enemy(int hp, int damage, int maxHp, int mana, int maxMana, char sym, Vec pos) : Character(hp, damage, maxHp, mana, maxMana, sym, pos) {};
@@ -107,7 +101,6 @@ public:
 		return make_shared<Projectile>(getPos() + getDirection(), getDirection(), getDamage(), 10, true);
 	}
 };
-
 
 class AidKit : public Actor {
 	int restoreHp;
@@ -127,10 +120,6 @@ public:
 	void Collide(Princess* o) override {}
 	void Collide(Zombie* o) override {}
 };
-
-
-
-
 
 class Princess : public Character {
 public:
@@ -218,8 +207,6 @@ public:
 
 };
 
-
-
 class Projectile : public Character { // пуля
 	int maxDist;
 	bool isEnemy;
@@ -271,9 +258,7 @@ public:
 	void Collide(Princess* o) override {
 		MarkForDelete();
 	}
-	
 };
-
 
 
 class Wall : public Actor {

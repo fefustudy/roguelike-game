@@ -4,7 +4,6 @@
 #include "windows.h" // sleep
 #include "Config.h"
 #include "Timer.h"
-#include <algorithm> // std::remove_if
 #include <cstdlib>
 
 using std::shared_ptr;
@@ -19,7 +18,6 @@ class Game {
 	shared_ptr<Map> map;
 	shared_ptr<Actor> mainPlayer;
 	shared_ptr<set<shared_ptr<Actor>>> actors;
-
 	set<shared_ptr<Actor>> moveDirection;
 
 public:
@@ -41,16 +39,13 @@ public:
 		t.start();
 		Timer tshot;
 		tshot.start();
-
 		Timer tMaxSpeedInterval;
 		tMaxSpeedInterval.start();
-
 		Timer tMana;
 		tMana.start();
 
 		mainPlayer = map->GetMainPlayer();
 		
-
 		while (1) {
 			if (Clean()) return;
 
@@ -75,7 +70,6 @@ public:
 					Fire(static_pointer_cast<Character>(mainPlayer));
 				}
 
-				// move user
 				tMaxSpeedInterval.start();
 			}
 
@@ -101,12 +95,10 @@ public:
 
 	bool Clean() {
 		if (mainPlayer->isMarkForDelete()) {
-			// игра конец
 			return true;
 		}
 
 		vector<shared_ptr<Actor>> forDel;
-
 		for (auto it = actors->begin(); it != actors->end(); it++) {
 			if ((*it)->isMarkForDelete()) {
 				forDel.push_back(*it);
@@ -121,14 +113,12 @@ public:
 		return false;
 	}
 
-
 	void Fire(shared_ptr<Character> a) {
 		auto pl = a->Fire();
 		if (pl && map->Add(pl)) {
 			moveDirection.insert(pl);
 		}
 	}
- 
 
 	void RestoreMana(int count) {
 		for (auto it = actors->begin(); it != actors->end(); it++) {
@@ -148,7 +138,6 @@ public:
 			}
 		}
 	}
-
 
 	void moveProjectilies() {
 		for (auto it = moveDirection.begin(); it != moveDirection.end(); it++) {

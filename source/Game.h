@@ -59,8 +59,10 @@ public:
 		Timer tMana;
 		tMana.start();
 
+		Timer shotInterval;
+		shotInterval.start();
+
 		mainPlayer = map->GetMainPlayer();
-		auto shotFlag = true;
 		while (1) {
 			if (Clean()) return s;
 
@@ -81,16 +83,14 @@ public:
 				else if (ch == 'a' || ch == KEY_LEFT) {
 					map->Step(mainPlayer, Vec::LEFT);
 				}
-				else if (ch == ' ' && shotFlag) { //Стрелятб
+				else if (ch == ' ' && shotInterval.elapsedSeconds() > 0.4 ) {
 					Fire(static_pointer_cast<Character>(mainPlayer));
-					shotFlag = false;
+					shotInterval.start();
 				}
 				tMaxSpeedInterval.start();
 			}
 
 			if (tshot.elapsedSeconds() >= 0.2) {
-				
-				shotFlag = true;
 				moveProjectilies();
 				tshot.start();
 			}

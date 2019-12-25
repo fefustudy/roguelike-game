@@ -16,7 +16,11 @@ using std::rand;
 
 enum GAME_STAT { UNDEF, WIN, DEFEAT };
 
-
+void winResize() {
+	if (is_termresized()) {
+		resize_term(0, 0);
+	}
+}
 
 class Game {
 	shared_ptr<Config> c;
@@ -44,6 +48,8 @@ public:
 
 	~Game() {};
 
+
+
 	GAME_STAT Start() {
 
 		srand(117);
@@ -56,14 +62,15 @@ public:
 		tMaxSpeedInterval.start();
 		Timer tMana;
 		tMana.start();
-
 		Timer shotInterval;
 		shotInterval.start();
+		Timer delta;
+		delta.start();
 
 		mainPlayer = map->GetMainPlayer();
 		while (1) {
-
-
+			auto lazyDraw = false;
+			
 			if (Clean()) return s;
 
 			auto ch = getch();
@@ -83,35 +90,40 @@ public:
 				else if (ch == 'a' || ch == KEY_LEFT) {
 					map->Step(mainPlayer, Vec::LEFT);
 				}
-				else if (ch == ' ' && shotInterval.elapsedSeconds() > 0.4 ) {
-					Fire(static_pointer_cast<Character>(mainPlayer));
-					shotInterval.start();
-				}
-
-				if (is_termresized()) {
-					resize_term(0, 0);
-				}
-
 				tMaxSpeedInterval.start();
+				lazyDraw = true;
+			}
+			if (ch == ' ' && shotInterval.elapsedSeconds() > 0.4) {
+				Fire(static_pointer_cast<Character>(mainPlayer));
+				shotInterval.start();
+				lazyDraw = true;
 			}
 
 			if (tshot.elapsedSeconds() >= 0.2) {
 				moveProjectilies();
 				tshot.start();
+				lazyDraw = true;
 			}
 
-			if (t.elapsedSeconds() >= 1.0) {
+			if (t.elapsedSeconds() >= 1) {
 				MoveMobs();
 				t.start();
+				lazyDraw = true;
 			}
 			if (tMana.elapsedSeconds() >= 1.0) {
 				RestoreMana(1);
 				tMana.start();
+				lazyDraw = true;
 			}
 
-			map->Draw();
+			if (lazyDraw) { 
+				winResize();
+				map->Draw(); 
+			}
+			//auto sleepTime = 16 - delta.elapsedMilliseconds();
+			//if(sleepTime > 3) Sleep(sleepTime);
 
-			Sleep(17); // 60 fps
+			//delta.start();
 		}
 	};
 

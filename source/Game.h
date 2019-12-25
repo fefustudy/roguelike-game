@@ -1,7 +1,7 @@
 #pragma once
 #include "Map.h"
 #include <curses.h>
-#include "windows.h" // sleep
+#include "windows.h" // sleep resize
 #include "Config.h"
 #include "Timer.h"
 #include <cstdlib>
@@ -19,8 +19,6 @@ enum GAME_STAT { UNDEF, WIN, DEFEAT };
 
 
 class Game {
-
-
 	shared_ptr<Config> c;
 	shared_ptr<Map> map;
 	shared_ptr<Actor> mainPlayer;
@@ -64,6 +62,8 @@ public:
 
 		mainPlayer = map->GetMainPlayer();
 		while (1) {
+
+
 			if (Clean()) return s;
 
 			auto ch = getch();
@@ -87,6 +87,11 @@ public:
 					Fire(static_pointer_cast<Character>(mainPlayer));
 					shotInterval.start();
 				}
+
+				if (is_termresized()) {
+					resize_term(0, 0);
+				}
+
 				tMaxSpeedInterval.start();
 			}
 

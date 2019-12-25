@@ -15,11 +15,14 @@ class Config {
 public:
 	Config() { }
 
+	//template <typename foo, typename bar> class one {};
+
 	std::pair<int, bool> GetFog() {
 		ifstream("config.json") >> j;
 
 		return{ j["FOG"]["distance"].get<int>() ,j["FOG"]["enable"].get<bool>() };
 	}
+
 
 	std::pair<shared_ptr<set<shared_ptr<Actor>>>, shared_ptr<Knight>>  FabricMap() {
 

@@ -191,7 +191,7 @@ public:
 	void Collide(Projectile* o) override {}
 
 	void Collide(Princess* o) override {
-		MarkForDelete();
+		o->MarkForDelete();
 	}
 
 	void Collide(Zombie* o) override {

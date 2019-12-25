@@ -12,6 +12,8 @@ using std::static_pointer_cast;
 using std::srand;
 using std::rand;
 
+enum GAME_STAT {UNDEF, WIN, DEFEAT };
+
 
 class Game {
 	shared_ptr<Config> c;
@@ -19,6 +21,8 @@ class Game {
 	shared_ptr<Actor> mainPlayer;
 	shared_ptr<set<shared_ptr<Actor>>> actors;
 	set<shared_ptr<Actor>> moveDirection;
+
+	GAME_STAT s = GAME_STAT::UNDEF;
 
 public:
 	Game() {
@@ -32,7 +36,7 @@ public:
 
 	~Game() {};
 
-	void Start() {
+	GAME_STAT Start() {
 		srand(117);
 
 		Timer t;
@@ -47,7 +51,7 @@ public:
 		mainPlayer = map->GetMainPlayer();
 		
 		while (1) {
-			if (Clean()) return;
+			if (Clean()) return s;
 
 			auto ch = getch();
 			if (ch != ERR && tMaxSpeedInterval.elapsedSeconds() > 0.05) {
@@ -95,6 +99,7 @@ public:
 
 	bool Clean() {
 		if (mainPlayer->isMarkForDelete()) {
+			s = GAME_STAT::DEFEAT;
 			return true;
 		}
 
@@ -106,6 +111,11 @@ public:
 		}
 
 		for (auto it = forDel.begin(); it != forDel.end(); it++) {
+			if (dynamic_pointer_cast<Princess>(*it)) {
+				s = GAME_STAT::WIN;
+				return true;
+			}
+
 			map->Hide(*it);
 			actors->erase(*it);
 			moveDirection.erase(*it);

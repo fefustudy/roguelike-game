@@ -36,6 +36,7 @@ const struct Vec Vec::DOWN = { 0 , 1 };
 const struct Vec Vec::LEFT = { -1 , 0 };
 const struct Vec Vec::DIRS[] = { Vec::UP, Vec::RIGHT, Vec::DOWN, Vec::LEFT };
 
+
 class Actor {
 	Vec pos;
 	char sym;

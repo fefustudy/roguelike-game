@@ -1,7 +1,7 @@
 {
   "Knight": {
     "damage": 5,
-    "hp": 100,
+    "hp": 15,
     "mana": 12,
     "maxHp": 150,
     "maxMana": 100,

@@ -7,6 +7,7 @@
 #include <curses.h>
 #include <memory>
 #include <cstdlib>
+#include "Factory.h"
 
 using std::vector;
 using std::map;
@@ -27,7 +28,10 @@ class Map {
 	set<pair<int, int>> fogOfWar;
 	bool fogOfWarIsEnable;
 	int fogOfWarDistSqr;
-
+	ZombieFactory zombieFactory;
+	WallFactory wallFactory;
+	AidKitFactory aidKitFactory;
+	DragonFactory dragonFactory;
 
 public:
 	Map(std::pair<shared_ptr<set<shared_ptr<Actor>>>, shared_ptr<Knight>> data, std::pair<int, bool> fog)
@@ -64,15 +68,9 @@ public:
 					if ((y - hy) * (y - hy) + (x - hx) * (x - hx) <= fogOfWarDistSqr) {
 						fogOfWar.insert({ x, y });
 
-						// TODO: генерация карты
-						/*if (rand() % 100 < 10) {
-							if (rand() % 100 < 50) {
-								Add()
-							}
-							else {
-
-							}
-						}*/
+						if (posBase.find({ x, y }) == posBase.end()) {
+							Gen(x, y);
+						}
 					}
 					else {
 						mvaddch(y - hy + my / 2, x - hx + mx / 2, '#');
@@ -140,6 +138,32 @@ public:
 		auto fromPos = from->getPos();
 		posBase.erase({ fromPos.x, fromPos.y });
 	}
+
+	void Gen(int x, int y) {
+
+
+		if (rand() % 100 < 2) {
+			if (rand() % 100 < 10) {
+				Add(zombieFactory.createActor(Vec(x, y)));
+			}
+			else {
+				Add(dragonFactory.createActor(Vec(x, y)));
+			}
+		}
+		else if (rand() % 100 < 10) {
+			auto diry = rand() % 2? 1 : -1;
+			auto dirx = rand() % 2;
+			auto len = rand() % 4;
+			for (size_t i = 0; i < len; i++) {
+				Add(wallFactory.createActor(Vec((x + i) * diry, (y + i) * dirx)));
+			}
+
+		}
+		else if(rand() % 100 < 1) {
+			Add(aidKitFactory.createActor(Vec(x, y)));
+		}
+	}
+
 
 	~Map() {
 	};

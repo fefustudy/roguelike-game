@@ -32,6 +32,8 @@ class Map {
 	WallFactory wallFactory;
 	AidKitFactory aidKitFactory;
 	DragonFactory dragonFactory;
+	BreakableWallFactory breakableWallFactory;
+
 
 public:
 	Map(std::pair<shared_ptr<set<shared_ptr<Actor>>>, shared_ptr<Knight>> data, std::pair<int, bool> fog)
@@ -155,7 +157,7 @@ public:
 			auto dirx = rand() % 2;
 			auto len = rand() % 4;
 			for (size_t i = 0; i < len; i++) {
-				Add(wallFactory.createActor(Vec((x + i) * diry, (y + i) * dirx)));
+				Add(breakableWallFactory.createActor(Vec((x + i) * diry, (y + i) * dirx)));
 			}
 
 		}

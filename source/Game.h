@@ -36,6 +36,7 @@ public:
 	DragonFactory dragonFactory;
 	WallFactory wallFactory;
 	AidKitFactory aidKitFactory;
+	BreakableWallFactory breakableWallFactory;
 
 
 	Game() {
@@ -225,6 +226,9 @@ public:
 				}
 				else if (a == "AidKit") {
 					out->insert(aidKitFactory.createActor(Vec(x, y)));
+				}
+				else if (a == "BreakableWall") {
+					out->insert(breakableWallFactory.createActor(Vec(x, y)));
 				}
 				x++;
 			}

@@ -99,3 +99,14 @@ public:
 			c.Get<string>(cn, "sym")[0]);
 	}
 };
+
+class BreakableWallFactory : public Factory {
+public:
+	BreakableWallFactory() : Factory("BreakableWall") {}
+
+	virtual shared_ptr<Actor> createActor(Vec pos) {
+		return make_shared<BreakableWall>(pos,
+			c.Get<int>(cn, "hp"),
+			c.Get<string>(cn, "sym")[0]);
+	}
+};

@@ -14,6 +14,7 @@ class Dragon;
 class Wall;
 class AidKit;
 class Projectile;
+class BreakableWall;
 
 struct Vec {
 	static const Vec UP, RIGHT, DOWN, LEFT;
@@ -63,6 +64,8 @@ public:
 	virtual void Collide(Projectile*) = 0;
 	virtual void Collide(Princess*) = 0;
 	virtual void Collide(Zombie*) = 0;
+	virtual void Collide(BreakableWall*) = 0;
+	
 };
 
 class Character : public Actor {
@@ -120,6 +123,7 @@ public:
 	void Collide(Projectile* o) override {}
 	void Collide(Princess* o) override {}
 	void Collide(Zombie* o) override {}
+	void Collide(BreakableWall* o) override {}
 };
 
 class Princess : public Character {
@@ -135,6 +139,7 @@ public:
 	void Collide(Projectile* o) override {}
 	void Collide(Princess* o) override {}
 	void Collide(Zombie* o) override {}
+	void Collide(BreakableWall* o) override {}
 
 };
 
@@ -151,6 +156,8 @@ public:
 	void Collide(Projectile* o) override {}
 	void Collide(Princess* o) override {}
 	void Collide(Zombie* o) override {}
+	void Collide(BreakableWall* o) override {}
+
 };
 
 class Dragon : public Enemy {
@@ -167,6 +174,28 @@ public:
 	void Collide(Projectile* o) override {}
 	void Collide(Princess* o) override {}
 	void Collide(Zombie* o) override {}
+	void Collide(BreakableWall* o) override {}
+
+};
+
+class BreakableWall : public Character {
+public:
+	BreakableWall(Vec pos, int hp, char sym) : Character(hp, 1, hp, 0, 0, sym, pos) {}
+	void Collide(shared_ptr<Actor> obj) override {
+		obj->Collide(this);
+	}
+
+	void Collide(Knight* o) override {}
+	void Collide(AidKit* o) override {}
+	void Collide(Dragon* o) override {}
+	void Collide(Wall* o) override {}
+	void Collide(Projectile* o) override {}
+	void Collide(Princess* o) override {}
+	void Collide(Zombie* o) override {}
+	void Collide(BreakableWall* o) override {}
+
+
+
 };
 
 class Knight : public Character {
@@ -196,6 +225,10 @@ public:
 	}
 
 	void Collide(Zombie* o) override {
+		AddHp(-o->getDamage());
+		o->AddHp(-getDamage());
+	}
+	void Collide(BreakableWall* o) override {
 		AddHp(-o->getDamage());
 		o->AddHp(-getDamage());
 	}
@@ -259,6 +292,11 @@ public:
 	void Collide(Princess* o) override {
 		MarkForDelete();
 	}
+	void Collide(BreakableWall* o) override {
+		o->AddHp(-damage);
+		MarkForDelete();
+	}
+
 };
 
 
@@ -276,4 +314,6 @@ public:
 	void Collide(Projectile* o) override {}
 	void Collide(Princess* o) override {}
 	void Collide(Zombie* o) override {}
+	void Collide(BreakableWall* o) override {}
+
 };

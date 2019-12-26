@@ -34,6 +34,10 @@
   "Wall": {
     "sym": "O"
   },
+  "BreakableWall": {
+    "sym": "B",
+    "hp": 20
+  },
   "AidKit": {
     "restoreHp": 10,
     "sym": "+"
